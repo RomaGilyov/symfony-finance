@@ -7,6 +7,14 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 class YahooFinanceApiClientTest extends KernelTestCase
 {
     /**
+     * @return void
+     */
+    protected function setUp(): void
+    {
+        self::bootKernel();
+    }
+
+    /**
      * @test
      * @group integration
      */
@@ -14,7 +22,7 @@ class YahooFinanceApiClientTest extends KernelTestCase
     {
         // Setup
         // Need YahooFinanceApiClient
-        $yahooFinanceApiClient = self::$kernel->getContainer()->get('yahoo-finance-api-client');
+        $yahooFinanceApiClient = static::$kernel->getContainer()->get('yahoo-finance-api-client');
 
         // Do something
         $response = $yahooFinanceApiClient->fetchStockProfile('AMZN', 'US'); // symbol, region
@@ -28,8 +36,8 @@ class YahooFinanceApiClientTest extends KernelTestCase
         $this->assertSame('US', $stockProfile->region);
         $this->assertSame('NasdaqGS', $stockProfile->exchangeName);
         $this->assertSame('USD', $stockProfile->currency);
-        $this->assertIsFloat($stockProfile->price);
-        $this->assertIsFloat($stockProfile->previousClose);
-        $this->assertIsFloat($stockProfile->priceChange);
+        $this->assertIsNumeric($stockProfile->price);
+        $this->assertIsNumeric($stockProfile->previousClose);
+        $this->assertIsNumeric($stockProfile->priceChange);
     }
 }

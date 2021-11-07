@@ -12,8 +12,8 @@ class YahooFinanceApiClient implements FinanceApiClientInterface
      */
     private HttpClientInterface $httpClient;
 
-    private const URL = 'https://apidojo-yahoo-finance-v1.p.rapidapi.com/stock/v2/get-profile';
-    private const X_RAPID_API_HOST = 'apidojo-yahoo-finance-v1.p.rapidapi.com';
+    private const URL = 'https://yh-finance.p.rapidapi.com/stock/v2/get-profile';
+    private const X_RAPID_API_HOST = 'yh-finance.p.rapidapi.com';
 
     /**
      * @var string
