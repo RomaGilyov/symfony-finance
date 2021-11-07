@@ -37,6 +37,12 @@
         <extension class="DAMA\DoctrineTestBundle\PHPUnit\PHPUnitExtension"/>
     </extensions>
 
+    <groups>
+        <exclude>
+            <group>integration</group>
+        </exclude>
+    </groups>
+
     <!-- Run `composer require symfony/panther` before enabling this extension -->
     <!--
     <extensions>
