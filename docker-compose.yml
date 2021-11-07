@@ -1,21 +1,65 @@
 version: '3'
 
 services:
-###> doctrine/doctrine-bundle ###
-  database:
-    image: postgres:${POSTGRES_VERSION:-13}-alpine
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB:-app}
-      # You should definitely change the password in production
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ChangeMe}
-      POSTGRES_USER: ${POSTGRES_USER:-symfony}
+  nginx:
+    image: nginx:stable-alpine
+    depends_on:
+      - php
+      - mysql
+    networks:
+      default:
+        aliases:
+          - symfony-finance.test
+    ports:
+      - "80:80"
+      - "81:81"
     volumes:
-      - db-data:/var/lib/postgresql/data:rw
+      - ./:/var/www/symfony
+      - ./app/nginx.conf:/etc/nginx/conf.d/default.conf
+
+###> doctrine/doctrine-bundle ###
+#  database:
+#    image: postgres:${POSTGRES_VERSION:-13}-alpine
+#    environment:
+#      POSTGRES_DB: ${POSTGRES_DB:-app}
+      # You should definitely change the password in production
+#      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-ChangeMe}
+#      POSTGRES_USER: ${POSTGRES_USER:-symfony}
+#    volumes:
+#      - db-data:/var/lib/postgresql/data:rw
       # You may use a bind-mounted host directory instead, so that it is harder to accidentally remove the volume and lose all your data!
       # - ./docker/db/data:/var/lib/postgresql/data:rw
 ###< doctrine/doctrine-bundle ###
+  mysql:
+    image: mysql:8.0.25
+    command: --default-authentication-plugin=mysql_native_password
+    restart: unless-stopped
+    tty: true
+    ports:
+      - ${MYSQL_PORT:-3325}:3306
+    volumes:
+      - ./app/mysql:/var/lib/mysql
+      - ./app/dump_files:/mysql_dump_files
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-secret}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-symfony}
+      MYSQL_USER: ${MYSQL_USER:-symfony}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-secret}
+      SERVICE_TAGS: dev
+      SERVICE_NAME: mysql
 
-volumes:
-###> doctrine/doctrine-bundle ###
-  db-data:
-###< doctrine/doctrine-bundle ###
+  php:
+    build:
+      context: .
+      dockerfile: app/php
+    container_name: php
+    environment:
+      SERVICE_NAME: php
+      SERVICE_TAGS: dev
+    volumes:
+      - ./:/var/www/symfony
+      - ./app/php.ini:/usr/local/etc/php/conf.d/local.ini
+    ports:
+      - ${PHP_PORT:-9015}:9000
+    restart: unless-stopped
+    tty: true
