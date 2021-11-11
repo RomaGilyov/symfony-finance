@@ -29,6 +29,8 @@ class StockTest extends DatabaseDependantTestCase
 
         $this->entityManager->persist($stock);
 
+//        Symfony\Bundle\SwiftmailerBundle\SwiftmailerBundle::class => ['all' => true],
+
         // Commit record to DB
         $this->entityManager->flush();
 
